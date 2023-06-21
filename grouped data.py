@@ -98,52 +98,49 @@ class table:
         if k > 99:
             raise Exception("k must not be higher than 99")
         else:
-            pass
-        KN100 = (k * self.N) / 100
-        for i in range(self.rows):
-            if KN100 <= self.cumulativeFrequencies[i]:
-                if i == 0:
-                    cfb = i
+            KN100 = (k * self.N) / 100
+            for i in range(self.rows):
+                if KN100 <= self.cumulativeFrequencies[i]:
+                    if i == 0:
+                        cfb = i
+                    else:
+                        cfb = self.cumulativeFrequencies[i-1]
+                    LB = self.lowerBoundaries[i]
+                    f = self.frequencies[i]
+                    break
                 else:
-                    cfb = self.cumulativeFrequencies[i-1]
-                LB = self.lowerBoundaries[i]
-                f = self.frequencies[i]
-                break
-            else:
-                pass
-        return (((KN100 - cfb) / f) * self.interval) + LB 
+                    pass
+            return (((KN100 - cfb) / f) * self.interval) + LB 
 
     def decile(self, k=5):
         if k > 9:
             raise Exception("k must not be higher than 9")
         else:
-            pass
-        KN10 = (k * self.N) / 10
-        for i in range(self.rows):
-            if KN10 <= self.cumulativeFrequencies[i]:
-                cfb = self.cumulativeFrequencies[i-1]
-                LB = self.lowerBoundaries[i]
-                f = self.frequencies[i]
-                break
-            else:
-                pass
-        return (((KN10 - cfb) / f) * self.interval) + LB 
+            KN10 = (k * self.N) / 10
+            for i in range(self.rows):
+                if KN10 <= self.cumulativeFrequencies[i]:
+                    cfb = self.cumulativeFrequencies[i-1]
+                    LB = self.lowerBoundaries[i]
+                    f = self.frequencies[i]
+                    break
+                else:
+                    pass
+            return (((KN10 - cfb) / f) * self.interval) + LB 
     
     def quartile(self, k=2):
         if k > 3:
             raise Exception("k must not be higher than 3")
         else:
-            pass
-        KN4 = (k * self.N) / 4
-        for i in range(self.rows):
-            if KN4 <= self.cumulativeFrequencies[i]:
-                cfb = self.cumulativeFrequencies[i-1]
-                LB = self.lowerBoundaries[i]
-                f = self.frequencies[i]
-                break
-            else:
-                pass
-        return (((KN4 - cfb) / f) * self.interval) + LB 
+            KN4 = (k * self.N) / 4
+            for i in range(self.rows):
+                if KN4 <= self.cumulativeFrequencies[i]:
+                    cfb = self.cumulativeFrequencies[i-1]
+                    LB = self.lowerBoundaries[i]
+                    f = self.frequencies[i]
+                    break
+                else:
+                    pass
+            return (((KN4 - cfb) / f) * self.interval) + LB 
     
     def mean(self):
         return sum(self.fx) / self.N

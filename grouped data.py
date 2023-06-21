@@ -3,44 +3,62 @@ class table:
     creating a table
     data = table(classIntervals=["1-5", "6-10", "11-15", "16-20", "21-25", "26-30", "31-35", "36-40"], frequencies=[2,9,15,20,17,25,2,1])
 
+    The inputs from the variable data should look like this:
+    -------------------------------
+    | Class Intervals | Frequency |
+    |-----------------|-----------|
+    |      1-5        |     2     |
+    |-----------------|-----------|
+    |      6-10       |     9     |
+    |-----------------|-----------|
+    |      11-15      |     15    |
+    |-----------------|-----------|
+    |      16-20      |     20    |
+    |-----------------|-----------|
+    |      21-25      |     17    |
+    |-----------------|-----------|
+    |      26-30      |     25    |
+    |-----------------|-----------|
+    |      31-35      |     2     |
+    |-----------------|-----------|
+    |      36-40      |     1     |
+    |-----------------------------|
+
+
+    Calculations:
+
     calculating the mean of the table
-    data.mean()
+    data.mean() \\ Output: 20.087912087912088
 
     calculating the median of the tabke
-    data.median()
+    data.median() \\ Output: 20.375
 
     calculating the percentile of the table (default value is 50)
-    data.percentile(25)
+    data.percentile(25) \\ Output: 14.416666666666666
 
     calculating the decile of the table (default value is 5)
-    data.decile(3)
+    data.decile(3) \\ Output: 15.825
 
     calculating the quartile (default value is 2)
-    data.quartile(1)
+    data.quartile(1) \\ Output: 14.416666666666666
 
     getting the midpoints of the table
-    data.midpoint
+    data.midpoint \\ Output: [3.0, 8.0, 13.0, 18.0, 23.0, 28.0, 33.0, 38.0]
 
     getting the frequencies x midpoint of the table
-    data.fx
+    data.fx \\ Output: [6.0, 72.0, 195.0, 360.0, 391.0, 700.0, 66.0, 38.0]
 
     getting the lower boundaries of the table
-    data.lowerBoundaries
+    data.lowerBoundaries \\ Output: [0.5, 5.5, 10.5, 15.5, 20.5, 25.5, 30.5, 35.5]
 
     getting the cumulative frequencies of the table 
-    data.cumulativeFrequencies
+    data.cumulativeFrequencies \\ Output: [2, 11, 26, 46, 63, 88, 90, 91]
 
     getting the summation of the frequencies 
-    data.N
+    data.N \\ Output: 91
     """
     def __init__(self, classIntervals, frequencies):
         cumulativeFrequencies = []
-        lowerBoundaries = []
-        midpoint = []
-        fx  = []
-        self.fx = fx 
-        self.midpoint = midpoint
-        self.lowerBoundaries = lowerBoundaries
         self.cumulativeFrequencies = cumulativeFrequencies
         self.frequencies = frequencies
         self.classIntervals = classIntervals
@@ -53,30 +71,20 @@ class table:
         
         self.classIntervals = [i.replace(" ", "") for i in classIntervals]
 
-        self.interval = (int(classIntervals[0][(classIntervals[0].find('-') + 1):]) - int(classIntervals[0][0:classIntervals[0].find('-')])) + 1
+
+        self.interval = (int(classIntervals[0].split('-')[1]) - int(classIntervals[0].split('-')[0]) + 1)
         self.N = sum(frequencies)
 
-        intervalBefore = int(classIntervals[0][0:classIntervals[0].find('-')]) - (int(classIntervals[-1][0:classIntervals[-1].find('-')]) - int(classIntervals[-2][classIntervals[-2].find('-') + 1:]))
-
         #Midpoint
-        for i in range(self.rows):
-            midpoint.append((int(classIntervals[i][0:classIntervals[i].find('-')]) + int(classIntervals[i][classIntervals[i].find('-')+1:])) / 2)
+        self.midpoint = [(int(interval.split('-')[0]) + int(interval.split('-')[1])) / 2 for interval in self.classIntervals]
 
-        #fx
-        for i in range(self.rows):
-            fx.append(midpoint[i] * frequencies[i])
-
+        # fx
+        self.fx = [mid * freq for mid, freq in zip(self.midpoint, self.frequencies)]
 
         #Lower Boundaries
-        for i in range(self.rows):
-            if i == 0:
-                lowerBoundaries.append((int(classIntervals[i][0:classIntervals[i].find('-')]) + intervalBefore) / 2)
-                # lowerBoundaries.append((int(classIntervals[i][0:classIntervals[i].find('-')]) + intervalBefore) / 2)
+        self.lowerBoundaries = [(int(interval.split('-')[0]) + (int(self.classIntervals[0].split('-')[0]) - (int(self.classIntervals[-1].split('-')[0]) - int(self.classIntervals[-2].split('-')[1])))) / 2 if i == 0 else (int(self.classIntervals[i-1].split('-')[1]) + int(interval.split('-')[0])) / 2 for i, interval in enumerate(self.classIntervals)]
 
-            else:
-                lowerBoundaries.append((int(classIntervals[i-1][classIntervals[i-1].find('-')+1:]) + int(classIntervals[i][0:classIntervals[i].find('-')]))/ 2)
-
-        #Cumulative Frequencies
+        # Cumulative Frequencies
         for i in range(self.rows):
             if i == 1:
                 cumulativeFrequencies.append(frequencies[i-1] + frequencies[i])
@@ -84,6 +92,7 @@ class table:
                 cumulativeFrequencies.append(frequencies[i] + cumulativeFrequencies[i-1])
             else:
                 cumulativeFrequencies.append(frequencies[i])
+
             
     def percentile(self, k=50):
         if k > 99:
@@ -137,12 +146,11 @@ class table:
         return (((KN4 - cfb) / f) * self.interval) + LB 
     
     def mean(self):
-        return sum(self.fx) / sum(self.frequencies)
+        return sum(self.fx) / self.N
     
     # I have to admit that this code was from ChatGPT
     def median(self):
-        N = sum(self.frequencies)
-        middlePosition = N / 2
+        middlePosition = self.N / 2
         cf = 0
         medianIntervalIndex = -1
 
@@ -154,6 +162,3 @@ class table:
         LB = self.lowerBoundaries[medianIntervalIndex]
         frequencyToReach = middlePosition - (cf - frequency)
         return LB + ((frequencyToReach / frequency) * self.interval)
-
-data1 = table(["30-39", "40-49 ", "50-59", "60-69", "70-79", "80-89", "90-99"], [3, 5, 8, 11, 6, 4, 3])
-print(data1.mean())

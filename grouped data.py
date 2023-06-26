@@ -42,6 +42,9 @@ class table:
     calculating the quartile (default value is 2)
     data.quartile(1) \\ Output: 14.416666666666666
 
+    calculating the percentile rank
+    data.percentileRank(25) \\ Output: 62.3989010989011
+
     getting the midpoints of the table
     data.midpoint \\ Output: [3.0, 8.0, 13.0, 18.0, 23.0, 28.0, 33.0, 38.0]
 
@@ -59,6 +62,8 @@ class table:
     """
     def __init__(self, classIntervals, frequencies):
         cumulativeFrequencies = []
+        ranges = []
+        self.ranges = ranges
         self.cumulativeFrequencies = cumulativeFrequencies
         self.frequencies = frequencies
         self.classIntervals = classIntervals
@@ -76,13 +81,13 @@ class table:
         self.N = sum(frequencies)
 
         #Midpoint
-        self.midpoint = [(int(interval.split('-')[0]) + int(interval.split('-')[1])) / 2 for interval in self.classIntervals]
+        self.midpoint = [(int(i.split('-')[0]) + int(i.split('-')[1])) / 2 for i in self.classIntervals]
 
         # fx
         self.fx = [mid * freq for mid, freq in zip(self.midpoint, self.frequencies)]
 
         #Lower Boundaries
-        self.lowerBoundaries = [(int(interval.split('-')[0]) + (int(self.classIntervals[0].split('-')[0]) - (int(self.classIntervals[-1].split('-')[0]) - int(self.classIntervals[-2].split('-')[1])))) / 2 if i == 0 else (int(self.classIntervals[i-1].split('-')[1]) + int(interval.split('-')[0])) / 2 for i, interval in enumerate(self.classIntervals)]
+        self.lowerBoundaries = [(int(j.split('-')[0]) + (int(self.classIntervals[0].split('-')[0]) - (int(self.classIntervals[-1].split('-')[0]) - int(self.classIntervals[-2].split('-')[1])))) / 2 if i == 0 else (int(self.classIntervals[i-1].split('-')[1]) + int(j.split('-')[0])) / 2 for i, j in enumerate(self.classIntervals)]
 
         # Cumulative Frequencies
         for i in range(self.rows):
@@ -93,7 +98,21 @@ class table:
             else:
                 cumulativeFrequencies.append(frequencies[i])
 
-            
+    def percentileRank(self, P):
+        toAppend = []
+        for i in self.classIntervals:
+            start = int(i.split('-')[0])
+            end = int(i.split('-')[1])
+            for j in range(start, end+1):
+                toAppend.append(j)
+            self.ranges.append(toAppend)
+            toAppend = []
+        
+        for index, classInt in enumerate(self.ranges):
+            if P in classInt:
+                break
+        return ((((P - self.lowerBoundaries[index]) * self.frequencies[index]) / self.interval) + self.cumulativeFrequencies[index - 1]) + (100/self.N)
+
     def percentile(self, k=50):
         if k > 99:
             raise Exception("k must not be higher than 99")

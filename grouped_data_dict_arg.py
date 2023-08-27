@@ -62,12 +62,10 @@ class table:
     data.N \\ Output: 91
     """
     def __init__(self, dictTable):
-        cumulativeFrequencies = []
-        ranges = []
-        self.ranges = ranges
-        self.cumulativeFrequencies = cumulativeFrequencies
+        self.ranges = []
+        self.cumulativeFrequencies = []
         self.frequencies = list(dictTable.values())
-        self.classIntervals = list(dictTable)
+        self.classIntervals = [list(map(int, i.split('-'))) for i in list(dictTable)]
         if len(self.frequencies) != len(self.classIntervals):
             raise Exception("frequencies and classIntervals must have the same length")
         elif len(self.frequencies) == 1 and len(self.classIntervals) == 1:
@@ -75,32 +73,32 @@ class table:
         else:
             self.rows = len(self.frequencies)
 
-        self.interval = (int(self.classIntervals[0].split('-')[1]) - int(self.classIntervals[0].split('-')[0]) + 1)
+        self.interval = (self.classIntervals[0][1] - self.classIntervals[0][0]) + 1
         self.N = sum(self.frequencies)
 
         #Midpoint
-        self.midpoint = [(int(i.split('-')[0]) + int(i.split('-')[1])) / 2 for i in self.classIntervals]
+        self.midpoint = [(i[0] + i[1]) / 2 for i in self.classIntervals]
 
         # fx
         self.fx = [mid * freq for mid, freq in zip(self.midpoint, self.frequencies)]
 
         #Lower Boundaries
-        self.lowerBoundaries = [(int(j.split('-')[0]) + (int(self.classIntervals[0].split('-')[0]) - (int(self.classIntervals[-1].split('-')[0]) - int(self.classIntervals[-2].split('-')[1])))) / 2 if i == 0 else (int(self.classIntervals[i-1].split('-')[1]) + int(j.split('-')[0])) / 2 for i, j in enumerate(self.classIntervals)]
+        self.lowerBoundaries = [(j[0] + (self.classIntervals[0][0] - (self.classIntervals[-1][0] - self.classIntervals[-2][1]))) / 2 if i == 0 else (self.classIntervals[i-1][1] + int(j[0])) / 2 for i, j in enumerate(self.classIntervals)]
 
         # Cumulative Frequencies
         for i in range(self.rows):
             if i == 1:
-                cumulativeFrequencies.append(self.frequencies[i-1] + self.frequencies[i])
+                self.cumulativeFrequencies.append(self.frequencies[i-1] + self.frequencies[i])
             elif i >= 2:
-                cumulativeFrequencies.append(self.frequencies[i] + cumulativeFrequencies[i-1])
+                self.cumulativeFrequencies.append(self.frequencies[i] + self.cumulativeFrequencies[i-1])
             else:
-                cumulativeFrequencies.append(self.frequencies[i])
+                self.cumulativeFrequencies.append(self.frequencies[i])
 
     def percentileRank(self, P):
         toAppend = []
         for i in self.classIntervals:
-            start = int(i.split('-')[0])
-            end = int(i.split('-')[1])
+            start = i[0]
+            end = i[1]
             for j in range(start, end+1):
                 toAppend.append(j)
             self.ranges.append(toAppend)
@@ -176,7 +174,3 @@ class table:
         LB = self.lowerBoundaries[medianIntervalIndex]
         frequencyToReach = middlePosition - (cf - frequency)
         return LB + ((frequencyToReach / frequency) * self.interval)
-
-
-data1 = table({"1-5": 2, "6-10": 9, "11-15": 15, "16-20": 20, "21-25": 17, "26-30": 25, "31-35": 2, "36-40": 1})
-print(data1.classIntervals)

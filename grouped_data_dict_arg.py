@@ -74,9 +74,6 @@ class table:
             raise Exception("frequency and classIntervals must have a length greater than 1")
         else:
             self.rows = len(self.frequencies)
-        
-        self.classIntervals = [i.replace(" ", "") for i in self.classIntervals]
-
 
         self.interval = (int(self.classIntervals[0].split('-')[1]) - int(self.classIntervals[0].split('-')[0]) + 1)
         self.N = sum(self.frequencies)

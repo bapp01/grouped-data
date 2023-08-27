@@ -74,8 +74,6 @@ class table:
         else:
             self.rows = len(frequencies)
         
-        self.classIntervals = [i.replace(" ", "") for i in classIntervals]
-
 
         self.interval = (int(classIntervals[0].split('-')[1]) - int(classIntervals[0].split('-')[0]) + 1)
         self.N = sum(frequencies)

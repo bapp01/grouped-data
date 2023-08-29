@@ -62,7 +62,6 @@ class table:
     data.N \\ Output: 91
     """
     def __init__(self, dictTable):
-        self.ranges = []
         self.cumulativeFrequencies = []
         self.frequencies = list(dictTable.values())
         self.classIntervals = [list(map(int, i.split('-'))) for i in list(dictTable)]
@@ -95,20 +94,11 @@ class table:
                 self.cumulativeFrequencies.append(self.frequencies[i])
 
     def percentileRank(self, P):
-        toAppend = []
-        for i in self.classIntervals:
-            start = i[0]
-            end = i[1]
-            for j in range(start, end+1):
-                toAppend.append(j)
-            self.ranges.append(toAppend)
-            toAppend = []
-        
-        for index, classInt in enumerate(self.ranges):
-            if P in classInt:
+        for i, j in enumerate(self.classIntervals):
+            if P >= j[0] and P <= j[1]:
                 break
-        return ((((P - self.lowerBoundaries[index]) * self.frequencies[index]) / self.interval) + self.cumulativeFrequencies[index - 1]) + (100/self.N)
-
+        return ((((P - self.lowerBoundaries[i]) * self.frequencies[i]) / self.interval) + self.cumulativeFrequencies[i - 1]) + (100/self.N)
+ 
     def percentile(self, k=50):
         if k > 99:
             raise Exception("k must not be higher than 99")

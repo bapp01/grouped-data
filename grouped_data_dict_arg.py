@@ -83,7 +83,7 @@ class table:
         self.fx = [mid * freq for mid, freq in zip(self.midpoint, self.frequencies)]
 
         #Lower Boundaries
-        self.lowerBoundaries = [(j[0] + (self.classIntervals[0][0] - (self.classIntervals[-1][0] - self.classIntervals[-2][1]))) / 2 if i == 0 else (self.classIntervals[i-1][1] + int(j[0])) / 2 for i, j in enumerate(self.classIntervals)]
+        self.lowerBoundaries = [(j[0] + (self.classIntervals[0][0] - (self.classIntervals[-1][0] - self.classIntervals[-2][1]))) / 2 if i == 0 else (self.classIntervals[i-1][1] + j[0)) / 2 for i, j in enumerate(self.classIntervals)]
 
         # Cumulative Frequencies
         for i in range(self.rows):
